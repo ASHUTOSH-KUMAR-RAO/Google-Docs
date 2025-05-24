@@ -42,6 +42,7 @@ body {
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -82,7 +83,513 @@ body {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+
+.tiptap {
+
+  img {
+    display: block;
+    height: auto;
+    margin: 1.5rem 0;
+    max-width: 100%;
+
+    &.ProseMirror-selectednode {
+      outline: 3px solid purple;
+    }
+  }
+
+  /* Enhanced Table Styles */
+  table {
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0;
+    overflow: hidden;
+    table-layout: fixed;
+    width: 100%;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background: white;
+
+    td,
+    th {
+      border-right: 1px solid var(--gray-3);
+      border-bottom: 1px solid var(--gray-3);
+      box-sizing: border-box;
+      min-width: 1em;
+      padding: 12px 16px;
+      position: relative;
+      vertical-align: top;
+      transition: all 0.15s ease;
+
+      >* {
+        margin-bottom: 0;
+      }
+    }
+
+    /* Remove borders on edges for clean rounded corners */
+    td:last-child,
+    th:last-child {
+      border-right: none;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    th {
+      background: linear-gradient(135deg, var(--gray-1) 0%, var(--gray-2) 100%);
+      font-weight: 600;
+      text-align: left;
+      color: var(--gray-9, #111827);
+      letter-spacing: 0.025em;
+      border-bottom: 2px solid var(--gray-4, #d1d5db);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    /* Enhanced row hover effects */
+    tbody tr {
+      transition: background-color 0.15s ease;
+    }
+
+    tbody tr:hover {
+      background-color: var(--gray-1);
+    }
+
+    tbody tr:hover td {
+      border-color: var(--gray-4, #d1d5db);
+    }
+
+    /* Subtle striped rows */
+    tbody tr:nth-child(even) {
+      background-color: rgba(249, 250, 251, 0.3);
+    }
+
+    .selectedCell {
+      z-index: 3;
+    }
+
+    .selectedCell:after {
+      background: var(--blue-2, rgba(59, 130, 246, 0.1));
+      border: 2px solid var(--blue-6, #2563eb);
+      content: "";
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      pointer-events: none;
+      position: absolute;
+      z-index: 4;
+      border-radius: 2px;
+    }
+
+    .column-resize-handle {
+      background: linear-gradient(to bottom,
+          transparent 0%,
+          var(--purple) 20%,
+          var(--purple) 80%,
+          transparent 100%);
+      bottom: 0;
+      pointer-events: none;
+      position: absolute;
+      right: -2px;
+      top: 0;
+      width: 3px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      border-radius: 1px;
+    }
+
+    /* Show resize handle on hover */
+    th:hover .column-resize-handle {
+      opacity: 1;
+    }
+
+    /* Cell focus styles */
+    td:focus,
+    th:focus {
+      outline: 2px solid #2563eb;
+      outline-offset: -2px;
+      background-color: #eff6ff;
+    }
+  }
+
+  .tableWrapper {
+    margin: 2rem 0;
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid gray;
+    background: white;
+  }
+
+  .resize-cursor {
+    cursor: col-resize;
+  }
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    table {
+      background: var(--gray-9, #111827);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+
+      td,
+      th {
+        border-color: var(--gray-7, #374151);
+        color: var(--gray-1, #f9fafb);
+      }
+
+      th {
+        background: linear-gradient(135deg, var(--gray-8, #1f2937) 0%, var(--gray-7, #374151) 100%);
+        color: var(--gray-1, #f9fafb);
+        border-bottom-color: var(--gray-6, #4b5563);
+      }
+
+      tbody tr:hover {
+        background-color: var(--gray-8, #1f2937);
+      }
+
+      tbody tr:hover td {
+        border-color: var(--gray-6, #4b5563);
+      }
+
+      tbody tr:nth-child(even) {
+        background-color: rgba(31, 41, 55, 0.3);
+      }
+
+      .selectedCell:after {
+        background: rgba(59, 130, 246, 0.2);
+        border-color: #3b82f6;
+      }
+
+      td:focus,
+      th:focus {
+        outline-color: #3b82f6;
+        background-color: rgba(59, 130, 246, 0.1);
+      }
+    }
+
+    .tableWrapper {
+      background: #111827;
+      border-color: #374151;
+    }
+  }
+
+  /* Heading styles */
+  /* Enhanced Heading Styles */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    line-height: 1.2;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    text-wrap: pretty;
+    font-weight: 600;
+    color: #1a1a1a;
+    letter-spacing: -0.02em;
+    transition: color 0.2s ease;
+  }
+
+  /* Larger headings get more spacing */
+  h1,
+  h2 {
+    margin-top: 3.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+  }
+
+  h3 {
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Font sizes with better scale */
+  h1 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    letter-spacing: -0.04em;
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    letter-spacing: -0.03em;
+  }
+
+  h3 {
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+    font-weight: 600;
+  }
+
+  h4 {
+    font-size: clamp(1.125rem, 2vw, 1.25rem);
+    font-weight: 600;
+  }
+
+  h5 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333;
+  }
+
+  h6 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Optional: Add subtle hover effects */
+  h1:hover,
+  h2:hover,
+  h3:hover {
+    color: #0066cc;
+  }
+
+  /* Optional: Add anchor link styling if using anchor links */
+  h1[id]:hover::after,
+  h2[id]:hover::after,
+  h3[id]:hover::after,
+  h4[id]:hover::after {
+    content: " #";
+    color: #999;
+    font-weight: normal;
+    opacity: 0.7;
+  }
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      color: #e5e5e5;
+    }
+
+    h5 {
+      color: #d1d1d1;
+    }
+
+    h6 {
+      color: #b3b3b3;
+    }
+
+    h1:hover,
+    h2:hover,
+    h3:hover {
+      color: #66b3ff;
+    }
+  }
+
+
+  /* List styles with smooth transitions */
+  ul,
+  ol {
+    padding: 0 1rem;
+    margin: 1.25rem 1rem 1.25rem 0.4rem;
+    transition: all 0.2s ease;
+  }
+
+  ul li {
+    list-style-type: disc;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    padding: 0.2rem 0.5rem;
+    margin: 0.1rem 0;
+    position: relative;
+
+    /* Hover effect for list items */
+    &:hover {
+      background-color: rgba(59, 130, 246, 0.08);
+      transform: translateX(4px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Animated marker */
+    &::marker {
+      color: #6b7280;
+      transition: color 0.3s ease;
+    }
+
+    &:hover::marker {
+      color: #3b82f6;
+    }
+
+    p {
+      margin-top: 0.25em;
+      margin-bottom: 0.25em;
+      transition: color 0.2s ease;
+    }
+  }
+
+  ol li {
+    list-style-type: decimal;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    padding: 0.2rem 0.5rem;
+    margin: 0.1rem 0;
+    position: relative;
+
+    /* Hover effect for ordered list items */
+    &:hover {
+      background-color: rgba(16, 185, 129, 0.08);
+      transform: translateX(4px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Animated marker */
+    &::marker {
+      color: #6b7280;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    &:hover::marker {
+      color: #10b981;
+      font-weight: 600;
+    }
+
+    p {
+      margin-top: 0.25em;
+      margin-bottom: 0.25em;
+      transition: color 0.2s ease;
+    }
+  }
+
+  /* Task list specific styles with enhanced interactivity */
+  ul[data-type="taskList"] {
+    list-style: none;
+    margin-left: 0;
+    padding: 0;
+
+    li {
+      align-items: center;
+      display: flex;
+      transition: all 0.3s ease;
+      border-radius: 6px;
+      padding: 0.4rem 0.6rem;
+      margin: 0.2rem 0;
+      border: 1px solid transparent;
+
+      /* Enhanced hover for task items */
+      &:hover {
+        background-color: rgba(139, 92, 246, 0.06);
+        border-color: rgba(139, 92, 246, 0.2);
+        transform: translateX(2px);
+        box-shadow: 0 2px 12px rgba(139, 92, 246, 0.15);
+      }
+
+      /* Completed task styling */
+      &:has(input[type="checkbox"]:checked) {
+        background-color: rgba(34, 197, 94, 0.05);
+        border-color: rgba(34, 197, 94, 0.2);
+
+        >div {
+          opacity: 0.7;
+          text-decoration: line-through;
+          color: #6b7280;
+        }
+
+        &:hover {
+          background-color: rgba(34, 197, 94, 0.1);
+          transform: translateX(1px);
+        }
+      }
+
+      >label {
+        flex: 0 0 auto;
+        margin-right: 0.5rem;
+        user-select: none;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+
+        &:hover {
+          transform: scale(1.1);
+        }
+      }
+
+      >div {
+        flex: 1 1 auto;
+        transition: all 0.3s ease;
+      }
+    }
+
+    /* Enhanced checkbox styling */
+    input[type="checkbox"] {
+      cursor: pointer;
+      width: 16px;
+      height: 16px;
+      transition: all 0.2s ease;
+      border-radius: 3px;
+      position: relative;
+
+      /* Custom focus ring */
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3);
+      }
+
+      /* Hover effect */
+      &:hover {
+        transform: scale(1.1);
+        box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2);
+      }
+
+      /* Checked state animation */
+      &:checked {
+        animation: checkboxPulse 0.3s ease;
+      }
+    }
+
+    /* Nested task lists */
+    ul[data-type="taskList"] {
+      margin: 0.5rem 0 0 1.5rem;
+      padding-left: 1rem;
+      border-left: 2px solid rgba(139, 92, 246, 0.1);
+      transition: border-color 0.3s ease;
+
+      &:hover {
+        border-color: rgba(139, 92, 246, 0.3);
+      }
+    }
+  }
+
+  /* Smooth focus animations */
+  ul:focus-within,
+  ol:focus-within {
+    transform: scale(1.01);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* Keyframe animations */
+@keyframes checkboxPulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Additional smooth scroll behavior */
+.tiptap * {
+  scroll-behavior: smooth;
 }
