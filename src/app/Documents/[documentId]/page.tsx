@@ -6,7 +6,7 @@ interface DocumentIdProps {
 }
 
 const DocumentIdPage = async ({ params }: DocumentIdProps) => {
-  const { documentId } = await params; // By the Help of Destructering
+  const { documentId } = await params; //! By the Help of Destructering
   return <div className="min-h-screen bg-[#f5f5f5]">
     <Toolbar/>
   <Editor/>

@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/store/use-editor-store";
-import { LucideIcon, Undo2Icon } from "lucide-react";
+import { LucideIcon, Redo2Icon, Undo2Icon, BoldIcon,  Printer, SpellCheckIcon  } from "lucide-react";
 
 interface ToolbarButtonProps {
   icon: LucideIcon;
@@ -27,7 +27,7 @@ const ToolbarBUtton = ({
       <Icon className="size-4" />
     </button>
   );
-};
+};  
 
 export const Toolbar = () => {
   const { editor } = useEditorStore();
@@ -44,7 +44,38 @@ export const Toolbar = () => {
         onClick: () => editor?.chain().focus().undo().run(),
         isActive: false,
       },
+
+      {
+        label:"Redo",
+        icon: Redo2Icon,
+        onClick: () => editor?.chain().focus().redo().run(),
+        isActive: false,
+      },{
+
+        label:"Print",
+        icon:Printer,
+        onClick: () => window.print(),
+        isActive: false,
+      },
+     
+      {
+        label: "Spell Check",
+        icon: SpellCheckIcon,
+        onClick: () => {
+          const current = editor?.view.dom.getAttribute("spellcheck");
+          editor?.view.dom.setAttribute("spellcheck", current === "false" ? "true" : "false");
+        }
+       
+      }
     ],
+    [
+      {
+        label: "Bold",
+        icon: BoldIcon,
+        onClick: () => editor?.chain().focus().toggleBold().run(),
+        isActive: editor?.isActive("underline"),
+      }
+    ]
   ];
   return (
     <div className="bg-[#f1f4f9] px-2.5 py-0.5 min-h-[40px] rounded-[20px] flex items-center gap-x-1 overflow-x-auto">
