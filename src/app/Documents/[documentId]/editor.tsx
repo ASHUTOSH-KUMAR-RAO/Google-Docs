@@ -1,6 +1,9 @@
 "use client";
 
 import { useEditor, EditorContent } from "@tiptap/react";
+import { Color } from '@tiptap/extension-color'
+import Highlight from '@tiptap/extension-highlight'
+import Link from '@tiptap/extension-link'
 import StarterKit from "@tiptap/starter-kit";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
@@ -51,6 +54,13 @@ export const Editor = () => {
     },
     extensions: [
       TextStyle,
+      Link.configure({
+        openOnClick:false,
+        autolink:true,
+        defaultProtocol:"https"
+      }),
+      Color,
+      Highlight.configure({multicolor:true}),
       Underline,
       ImageResize,
       Image,
