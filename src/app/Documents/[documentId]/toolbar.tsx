@@ -38,8 +38,119 @@ import {
   ImageIcon,
   UploadIcon,
   SearchIcon,
+  AlignLeftIcon,
+  AlignCenterIcon,
+  AlignRightIcon,
+  AlignJustifyIcon,
+  ListIcon,
+  ListOrderedIcon,
 } from "lucide-react";
 
+const ListButton = () => {
+  const { editor } = useEditorStore();
+
+  const lists = [
+    {
+      label: "Bullet List",
+      icons: ListIcon,
+      isActive: () => editor?.isActive("bulletList"),
+      onClick: () => editor?.chain().focus().toggleBulletList().run(),
+    },
+    {
+      label: "Orderd List",
+      icons: ListOrderedIcon,
+      isActive: () => editor?.isActive("oderdlist"),
+      onClick: () => editor?.chain().focus().toggleOrderedList().run(),
+    },
+  ];
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="group relative h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md hover:border-yellow-300 hover:bg-yellow-50 transition-all duration-200 transform hover:scale-105">
+          <div className="relative">
+            <ListIcon className="h-4 w-4 text-gray-600 group-hover:text-yellow-600 transition-colors" />
+          </div>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="p-1 flex flex-col gap-y-1">
+        <div className="space-y-2">
+          {lists.map(({ label, icons: Icon, onClick, isActive }) => (
+            <button
+              key={label}
+              onClick={onClick}
+              className={cn(
+                "flex items-center gap-x-2 px-2 py-1 rounded-sm hover:bg-neutral-200/80",
+                isActive() && "bg-neutral-200/80"
+              )}
+            >
+              <Icon className="size-4" />
+              <span className="text-sm">{label}</span>
+            </button>
+          ))}
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+const AlignButton = () => {
+  const { editor } = useEditorStore();
+
+  const alignments = [
+    {
+      label: "Align Left",
+      value: "left",
+      icons: AlignLeftIcon,
+    },
+    {
+      label: "Align Center",
+      value: "center",
+      icons: AlignCenterIcon,
+    },
+    {
+      label: "Align Right",
+      value: "right",
+      icons: AlignRightIcon,
+    },
+    {
+      label: "Align Justify",
+      value: "justify",
+      icons: AlignJustifyIcon,
+    },
+  ];
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="group relative h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md hover:border-yellow-300 hover:bg-yellow-50 transition-all duration-200 transform hover:scale-105">
+          <div className="relative">
+            <AlignLeftIcon className="h-4 w-4 text-gray-600 group-hover:text-yellow-600 transition-colors" />
+          </div>
+          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            Highlight
+          </div>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="p-1 flex flex-col gap-y-1">
+        <div className="space-y-2">
+          {alignments.map(({ label, value, icons: Icon }) => (
+            <button
+              key={value}
+              onClick={() => editor?.chain().focus().setTextAlign(value).run()}
+              className={cn(
+                "flex items-center gap-x-2 px-2 py-1 rounded-sm hover:bg-neutral-200/80",
+                editor?.isActive({ textAlign: value }) && "bg-neutral-200/80"
+              )}
+            >
+              <Icon className="size-4" />
+              <span className="text-sm">{label}</span>
+            </button>
+          ))}
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
 // 🖼️ Image Upload Component - File upload aur URL se image add karne ke liye
 const ImageButton = () => {
   const { editor } = useEditorStore();
@@ -84,29 +195,33 @@ const ImageButton = () => {
             <ImageIcon className="h-4 w-4 text-gray-600 group-hover:text-blue-600 transition-colors" />
             {/* Tooltip effect */}
             <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-              Image Add 
+              Image Add
             </div>
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-48 p-2 bg-white border border-gray-200 rounded-xl shadow-lg">
-          <DropdownMenuItem 
+          <DropdownMenuItem
             onClick={onUpload}
             className="flex items-center gap-3 p-3 rounded-lg hover:bg-blue-50 cursor-pointer transition-colors"
           >
             <div className="p-1 bg-blue-100 rounded-md">
               <UploadIcon className="h-4 w-4 text-blue-600" />
             </div>
-            <span className="text-sm font-medium text-gray-700">Upload Images📁</span>
+            <span className="text-sm font-medium text-gray-700">
+              Upload Images📁
+            </span>
           </DropdownMenuItem>
 
-          <DropdownMenuItem 
+          <DropdownMenuItem
             onClick={() => setIsDialogOpen(true)}
             className="flex items-center gap-3 p-3 rounded-lg hover:bg-green-50 cursor-pointer transition-colors"
           >
             <div className="p-1 bg-green-100 rounded-md">
               <SearchIcon className="h-4 w-4 text-green-600" />
             </div>
-            <span className="text-sm font-medium text-gray-700">URL Paste  🔗</span>
+            <span className="text-sm font-medium text-gray-700">
+              URL Paste 🔗
+            </span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -117,7 +232,7 @@ const ImageButton = () => {
           <DialogHeader className="text-center pb-4 border-b border-gray-100">
             <DialogTitle className="text-lg font-semibold text-gray-800 flex items-center justify-center gap-2">
               <ImageIcon className="h-5 w-5 text-blue-600" />
-              Image URL Add 
+              Image URL Add
             </DialogTitle>
           </DialogHeader>
           <div className="py-4">
@@ -134,7 +249,7 @@ const ImageButton = () => {
             />
           </div>
           <DialogFooter>
-            <Button 
+            <Button
               onClick={handleImageUrlSubmit}
               className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-3 rounded-xl transition-all duration-200 transform hover:scale-105"
             >
@@ -184,7 +299,7 @@ const LinkButton = () => {
             onChange={(e) => setValue(e.target.value)}
             className="flex-1 px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
           />
-          <Button 
+          <Button
             onClick={() => onChange(value)}
             className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-4 py-2 rounded-lg transition-all duration-200 transform hover:scale-105"
           >
@@ -211,16 +326,21 @@ const HighlightColorButton = () => {
         <button className="group relative h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md hover:border-yellow-300 hover:bg-yellow-50 transition-all duration-200 transform hover:scale-105">
           <div className="relative">
             <HighlighterIcon className="h-4 w-4 text-gray-600 group-hover:text-yellow-600 transition-colors" />
-            <div className="absolute -bottom-1 left-0 right-0 h-1 rounded-full" style={{ backgroundColor: value }}></div>
+            <div
+              className="absolute -bottom-1 left-0 right-0 h-1 rounded-full"
+              style={{ backgroundColor: value }}
+            ></div>
           </div>
           <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-            Highlight 
+            Highlight
           </div>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-4 bg-white border border-gray-200 rounded-xl shadow-lg">
         <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-700 text-center">Highlight Color चुनें</h4>
+          <h4 className="text-sm font-medium text-gray-700 text-center">
+            Highlight Color
+          </h4>
           <SketchPicker onChange={onChange} color={value} />
         </div>
       </DropdownMenuContent>
@@ -241,8 +361,13 @@ const TextColorButton = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="group relative h-8 w-8 flex flex-col items-center justify-center rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md hover:border-red-300 hover:bg-red-50 transition-all duration-200 transform hover:scale-105">
-          <span className="text-sm font-bold text-gray-600 group-hover:text-red-600 transition-colors">A</span>
-          <div className="h-0.5 w-4 rounded-full mt-0.5" style={{ backgroundColor: value }} />
+          <span className="text-sm font-bold text-gray-600 group-hover:text-red-600 transition-colors">
+            A
+          </span>
+          <div
+            className="h-0.5 w-4 rounded-full mt-0.5"
+            style={{ backgroundColor: value }}
+          />
           <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
             Text Color
           </div>
@@ -250,7 +375,9 @@ const TextColorButton = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-4 bg-white border border-gray-200 rounded-xl shadow-lg">
         <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-700 text-center">Text Color चुनें</h4>
+          <h4 className="text-sm font-medium text-gray-700 text-center">
+            Text Color चुनें
+          </h4>
           <SketchPicker color={value} onChange={onChange} />
         </div>
       </DropdownMenuContent>
@@ -282,11 +409,16 @@ const HeadingLevelButton = () => {
           <button
             key={level}
             onClick={() => {
-              editor?.chain().focus().setHeading({ level: level as any }).run();
+              editor
+                ?.chain()
+                .focus()
+                .setHeading({ level: level as any })
+                .run();
             }}
             className={cn(
               "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all duration-200 hover:bg-indigo-50",
-              currentLevel === level && "bg-indigo-100 text-indigo-700 font-medium"
+              currentLevel === level &&
+                "bg-indigo-100 text-indigo-700 font-medium"
             )}
           >
             <span className="text-sm font-medium">H{level}</span>
@@ -302,7 +434,7 @@ const HeadingLevelButton = () => {
 const FontFamilyButton = () => {
   const { editor } = useEditorStore();
   const currentFont = editor?.getAttributes("textStyle").fontFamily;
-  
+
   const fonts = [
     { label: "Arial", value: "Arial, sans-serif" },
     { label: "Times New Roman", value: "'Times New Roman', serif" },
@@ -317,7 +449,7 @@ const FontFamilyButton = () => {
   ];
 
   const getCurrentFontLabel = () => {
-    const currentFontObj = fonts.find(font => font.value === currentFont);
+    const currentFontObj = fonts.find((font) => font.value === currentFont);
     return currentFontObj?.label || "Arial";
   };
 
@@ -370,15 +502,18 @@ const ToolbarButton = ({
   isActive,
   onClick,
   label,
-  colorClass = "blue"
+  colorClass = "blue",
 }: ToolbarButtonProps) => {
   const getColorClasses = (color: string) => {
     const colorMap = {
       blue: "hover:border-blue-300 hover:bg-blue-50 group-hover:text-blue-600",
-      green: "hover:border-green-300 hover:bg-green-50 group-hover:text-green-600",
+      green:
+        "hover:border-green-300 hover:bg-green-50 group-hover:text-green-600",
       red: "hover:border-red-300 hover:bg-red-50 group-hover:text-red-600",
-      purple: "hover:border-purple-300 hover:bg-purple-50 group-hover:text-purple-600",
-      orange: "hover:border-orange-300 hover:bg-orange-50 group-hover:text-orange-600",
+      purple:
+        "hover:border-purple-300 hover:bg-purple-50 group-hover:text-purple-600",
+      orange:
+        "hover:border-orange-300 hover:bg-orange-50 group-hover:text-orange-600",
     };
     return colorMap[color as keyof typeof colorMap] || colorMap.blue;
   };
@@ -392,10 +527,12 @@ const ToolbarButton = ({
         isActive && "bg-blue-100 border-blue-300 shadow-md scale-105"
       )}
     >
-      <Icon className={cn(
-        "h-4 w-4 text-gray-600 transition-colors",
-        isActive && "text-blue-600"
-      )} />
+      <Icon
+        className={cn(
+          "h-4 w-4 text-gray-600 transition-colors",
+          isActive && "text-blue-600"
+        )}
+      />
       {/* Tooltip */}
       <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
         {label}
@@ -409,7 +546,8 @@ export const Toolbar = () => {
   const { editor } = useEditorStore();
 
   // Spell check ki current state check karne ke liye
-  const isSpellCheckActive = editor?.view.dom.getAttribute("spellcheck") === "true";
+  const isSpellCheckActive =
+    editor?.view.dom.getAttribute("spellcheck") === "true";
 
   // 📋 Toolbar sections - Different categories mein buttons organize kiye gaye hain
   const sections: {
@@ -429,7 +567,7 @@ export const Toolbar = () => {
         colorClass: "blue",
       },
       {
-        label: "Redo करें", 
+        label: "Redo करें",
         icon: Redo2Icon,
         onClick: () => editor?.chain().focus().redo().run(),
         isActive: false,
@@ -523,7 +661,10 @@ export const Toolbar = () => {
       </div>
 
       {/* Elegant Separator */}
-      <Separator orientation="vertical" className="h-8 bg-gradient-to-b from-gray-300 to-gray-400 w-px rounded-full" />
+      <Separator
+        orientation="vertical"
+        className="h-8 bg-gradient-to-b from-gray-300 to-gray-400 w-px rounded-full"
+      />
 
       {/* Font Controls */}
       <div className="flex items-center gap-2">
@@ -531,13 +672,17 @@ export const Toolbar = () => {
         <HeadingLevelButton />
       </div>
 
-      <Separator orientation="vertical" className="h-8 bg-gradient-to-b from-gray-300 to-gray-400 w-px rounded-full" />
+      {/* Font Size */}
+      <Separator
+        orientation="vertical"
+        className="h-8 bg-gradient-to-b from-gray-300 to-gray-400 w-px rounded-full"
+      />
 
       {/* Text Formatting Buttons */}
       <div className="flex items-center gap-2">
         {sections[1].map((item) => (
-          <ToolbarButton 
-            key={item.label} 
+          <ToolbarButton
+            key={item.label}
             icon={item.icon}
             isActive={item.isActive}
             onClick={item.onClick}
@@ -553,7 +698,10 @@ export const Toolbar = () => {
         <HighlightColorButton />
       </div>
 
-      <Separator orientation="vertical" className="h-8 bg-gradient-to-b from-gray-300 to-gray-400 w-px rounded-full" />
+      <Separator
+        orientation="vertical"
+        className="h-8 bg-gradient-to-b from-gray-300 to-gray-400 w-px rounded-full"
+      />
 
       {/* Media & Link Controls */}
       <div className="flex items-center gap-2">
@@ -561,19 +709,22 @@ export const Toolbar = () => {
         <ImageButton />
       </div>
 
-      <Separator orientation="vertical" className="h-8 bg-gradient-to-b from-gray-300 to-gray-400 w-px rounded-full" />
+      {/* TODO : Align */}
+      <AlignButton />
+      {/* TODO : Line Height */}
+      {/* TODO : List */}
+
+      <ListButton />
+
+      <Separator
+        orientation="vertical"
+        className="h-8 bg-gradient-to-b from-gray-300 to-gray-400 w-px rounded-full"
+      />
 
       {/* Content & List Controls */}
       <div className="flex items-center gap-2">
         {sections[2].map((item) => (
-          <ToolbarButton 
-            key={item.label} 
-            icon={item.icon}
-            isActive={item.isActive}
-            onClick={item.onClick}
-            label={item.label}
-            colorClass={item.colorClass}
-          />
+          <ToolbarButton key={item.label} {...item} />
         ))}
       </div>
     </div>
