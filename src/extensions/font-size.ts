@@ -1,11 +1,7 @@
-
 import { Extension } from "@tiptap/react";
-
-import "@tiptap/extension-text-style"
-
+import "@tiptap/extension-text-style";
 
 declare module "@tiptap/core" {
-
     interface Commands<ReturnType> {
         fontSize: {
             setFontSize: (size: string) => ReturnType
@@ -16,27 +12,29 @@ declare module "@tiptap/core" {
 
 export const FontSizeExtension = Extension.create({
     name: "fontSize",
+    
     addOptions() {
         return {
-            type: ["textStyle"]
+            types: ["textStyle"] // 'type' nahi 'types' hona chahiye
         }
     },
-
+    
     addGlobalAttributes() {
         return [
             {
                 types: this.options.types,
                 attributes: {
                     fontSize: {
-                        default: {
-                            parseHTML: (element: HTMLElement) => element.style.fontSize,
-                            randerHTML: (attrubutes: any) => {
-                                if (!attrubutes.fontSize) {
-                                    return {};
-                                }
-                                return {
-                                    style: `font-size ${attrubutes.fontSize}`
-                                }
+                        default: null,
+                        parseHTML: (element: HTMLElement) => {
+                            return element.style.fontSize || null;
+                        },
+                        renderHTML: (attributes: any) => { // spelling fix
+                            if (!attributes.fontSize) {
+                                return {};
+                            }
+                            return {
+                                style: `font-size: ${attributes.fontSize}` // colon add kiya
                             }
                         }
                     }
@@ -44,6 +42,7 @@ export const FontSizeExtension = Extension.create({
             }
         ]
     },
+    
     addCommands() {
         return {
             setFontSize: (fontSize: string) => ({ chain }) => {
@@ -54,4 +53,4 @@ export const FontSizeExtension = Extension.create({
             }
         }
     }
-})
+});
