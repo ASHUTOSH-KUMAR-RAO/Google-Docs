@@ -17,10 +17,13 @@ import Image from "@tiptap/extension-image";
 import Underline from "@tiptap/extension-underline";
 import TextStyle from "@tiptap/extension-text-style";
 import TextAlign from "@tiptap/extension-text-align";
+import { History } from "@tiptap/extension-history"; // ⭐ Yeh add karo
 import { useEditorStore } from "@/store/use-editor-store";
 import { FontSizeExtension } from "@/extensions/font-size";
 
-// ImageResize ko optional banaya - agar install nahi hai to error nahi aayega
+// ! Fixing the image Resize extention :-
+
+// todo=> When We Run The Command  npm i tiptap-extention-resize-image@1.2.1 --legacy-peer-deps and after that clear npm-catch then problem will be resoleved .....
 let ImageResize: any = null;
 try {
   ImageResize = require("tiptap-extension-resize-image").default;
@@ -32,15 +35,13 @@ export const Editor = () => {
   const { setEditor } = useEditorStore();
   const [isMounted, setIsMounted] = useState(false);
 
-  // SSR hydration fix
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   const editor = useEditor({
-    // SSR fix - yeh bahut important hai
     immediatelyRender: false,
-    
+
     onCreate({ editor }) {
       if (setEditor) {
         setEditor(editor);
@@ -81,7 +82,7 @@ export const Editor = () => {
         setEditor(editor);
       }
     },
-    
+
     editorProps: {
       attributes: {
         style: "padding-left: 56px; padding-right: 56px;",
@@ -91,89 +92,96 @@ export const Editor = () => {
     },
 
     extensions: [
-      // StarterKit ko pehle rakho - image disable kar diya to avoid conflicts
+      // ⭐ StarterKit se history remove kar diya
       StarterKit.configure({
-        history: false, // History conflicts avoid karne ke liye
+        history: false, // Disable default history
       }),
-      
+
+      // ⭐ Manual History extension add kiya with custom config
+      History.configure({
+        depth: 100, // 100 steps tak undo kar sakte ho
+        newGroupDelay: 500, // 500ms delay after typing to create new undo group
+      }),
+
       // Text styling extensions
       TextStyle,
       FontSizeExtension,
       FontFamily.configure({
-        types: ['textStyle'],
+        types: ["textStyle"],
       }),
-      
+
       // Text alignment
       TextAlign.configure({
         types: ["heading", "paragraph"],
       }),
-      
+
       // Styling extensions
       Color.configure({
-        types: ['textStyle'],
+        types: ["textStyle"],
       }),
-      Highlight.configure({ 
-        multicolor: true 
+      Highlight.configure({
+        multicolor: true,
       }),
       Underline,
-      
+
       // Link extension
       Link.configure({
         openOnClick: false,
         autolink: true,
         defaultProtocol: "https",
         HTMLAttributes: {
-          class: 'text-blue-600 underline cursor-pointer',
+          class: "text-blue-600 underline cursor-pointer",
         },
       }),
-      
-      // Image extensions - conditional loading
+
+      // Image extensions
       Image.configure({
         HTMLAttributes: {
-          class: 'rounded-lg border border-stone-200 max-w-full h-auto',
+          class: "rounded-lg border border-stone-200 max-w-full h-auto",
         },
         allowBase64: true,
       }),
-      
+
       // ImageResize only if available
       ...(ImageResize ? [ImageResize] : []),
-      
+
       // Task extensions
       TaskList.configure({
         HTMLAttributes: {
-          class: 'not-prose pl-2',
+          class: "not-prose pl-2",
         },
       }),
       TaskItem.configure({
         nested: true,
         HTMLAttributes: {
-          class: 'flex items-start my-4',
+          class: "flex items-start my-4",
         },
       }),
-      
-      // Table extensions - proper order maintain karo
+
+      // Table extensions
       Table.configure({
         resizable: true,
         HTMLAttributes: {
-          class: 'border-collapse table-auto w-full',
+          class: "border-collapse table-auto w-full",
         },
       }),
       TableRow.configure({
         HTMLAttributes: {
-          class: 'border border-gray-300',
+          class: "border border-gray-300",
         },
       }),
       TableHeader.configure({
         HTMLAttributes: {
-          class: 'border border-gray-300 px-4 py-2 bg-gray-50 font-bold text-left',
+          class:
+            "border border-gray-300 px-4 py-2 bg-gray-50 font-bold text-left",
         },
       }),
       TableCell.configure({
         HTMLAttributes: {
-          class: 'border border-gray-300 px-4 py-2',
+          class: "border border-gray-300 px-4 py-2",
         },
       }),
-    ].filter(Boolean), // Remove null/undefined extensions
+    ].filter(Boolean),
 
     content: `
       <table>
@@ -193,7 +201,6 @@ export const Editor = () => {
     `,
   });
 
-  // Loading state for SSR
   if (!isMounted || !editor) {
     return (
       <div className="size-full overflow-x-auto bg-[#f9fbfd] px-4 print:p-0 print:bg-white print:overflow-hidden">
@@ -216,5 +223,3 @@ export const Editor = () => {
     </div>
   );
 };
-
-//!print media query=> Jab user koi webpage print karta hai ya PDF banata hai, tab normal screen wale styles kaafi weird lag sakte hain. Print media query use karke hum specifically print ke liye styles define kar sakte hain.
