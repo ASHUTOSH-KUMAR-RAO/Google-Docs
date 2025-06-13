@@ -20,6 +20,8 @@ import TextAlign from "@tiptap/extension-text-align";
 import { History } from "@tiptap/extension-history"; // ⭐ Yeh add karo
 import { useEditorStore } from "@/store/use-editor-store";
 import { FontSizeExtension } from "@/extensions/font-size";
+import { LineHeightExtension } from "@/extensions/line-height";
+import { types } from "util";
 
 // ! Fixing the image Resize extention :-
 
@@ -106,6 +108,10 @@ export const Editor = () => {
       // Text styling extensions
       TextStyle,
       FontSizeExtension,
+      LineHeightExtension.configure({
+        types: ["heading", "paragraph"],
+        defaultLineHeight: "normal",
+      }),
       FontFamily.configure({
         types: ["textStyle"],
       }),

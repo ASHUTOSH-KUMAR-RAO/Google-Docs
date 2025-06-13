@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/store/use-editor-store";
 import { type ColorResult, SketchPicker } from "react-color";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -49,13 +49,203 @@ import {
   Palette,
   Type,
   Sparkles,
+
 } from "lucide-react";
 
+const LineHeightButton = () => {
+  const { editor } = useEditorStore();
+  const [currentLineHeight, setCurrentLineHeight] = useState("normal");
+  
+  // Force re-render when editor state changes
+  useEffect(() => {
+    if (!editor) return;
+    
+    const updateLineHeight = () => {
+      const newLineHeight = getCurrentLineHeight();
+      setCurrentLineHeight(newLineHeight);
+    };
+    
+    // Listen to editor state changes
+    editor.on('selectionUpdate', updateLineHeight);
+    editor.on('transaction', updateLineHeight);
+    
+    // Initial update
+    updateLineHeight();
+    
+    return () => {
+      editor.off('selectionUpdate', updateLineHeight);
+      editor.off('transaction', updateLineHeight);
+    };
+  }, [editor]);
+  
+  const lineHeights = [
+    {
+      label: "Default",
+      value: "normal",
+      icon: "⎯",
+      description: "Default line height",
+    },
+    {
+      label: "Single",
+      value: "1",
+      icon: "≡",
+      description: "Single line height",
+    },
+    {
+      label: "1.15",
+      value: "1.15",
+      icon: "☰",
+      description: "1.15 line height",
+    },
+    {
+      label: "1.5",
+      value: "1.5",
+      icon: "≣",
+      description: "1.5 line height",
+    },
+    {
+      label: "Double",
+      value: "2",
+      icon: "⋮",
+      description: "Double line height",
+    },
+  ];
+
+  // Get current line height from selected node
+  const getCurrentLineHeight = useCallback(() => {
+    if (!editor) return "normal";
+    
+    try {
+      const { selection } = editor.state;
+      const { $from } = selection;
+      
+      // Find the nearest node with lineHeight attribute
+      for (let depth = $from.depth; depth >= 0; depth--) {
+        const node = $from.node(depth);
+        if (node.attrs && node.attrs.lineHeight) {
+          return node.attrs.lineHeight;
+        }
+      }
+      
+      // Fallback: check if we can get attributes from editor
+      const attrs = editor.getAttributes('paragraph') || editor.getAttributes('heading');
+      return attrs.lineHeight || "normal";
+    } catch (error) {
+      return "normal";
+    }
+  }, [editor]);
+
+  const getCurrentIcon = useCallback(() => {
+    const current = lineHeights.find(({ value }) => value === currentLineHeight);
+    return current?.icon || "⎯";
+  }, [currentLineHeight]);
+
+  const CurrentIcon = getCurrentIcon();
+
+  const handleLineHeightChange = useCallback((value: string) => {
+    if (!editor) return;
+    
+    try {
+      if (value === "normal") {
+        editor.chain().focus().unsetLineHeight().run();
+      } else {
+        editor.chain().focus().setLineHeight(value).run();
+      }
+      
+      // Force immediate state update
+      setTimeout(() => {
+        const newLineHeight = getCurrentLineHeight();
+        setCurrentLineHeight(newLineHeight);
+      }, 50);
+      
+    } catch (error) {
+      console.error("Error changing line height:", error);
+    }
+  }, [editor, getCurrentLineHeight]);
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="group relative h-9 w-9 flex items-center justify-center rounded-xl border border-gray-200/60 bg-white/90 shadow-lg hover:shadow-xl hover:border-purple-300/60 hover:bg-gradient-to-br hover:from-purple-50 hover:to-purple-100 transition-all duration-300 transform hover:scale-105 backdrop-blur-md">
+          <span className="text-lg font-mono text-gray-600 group-hover:text-purple-600 transition-all duration-300 group-hover:scale-110">{CurrentIcon}</span>
+          <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900/90 text-white text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap backdrop-blur-sm">
+            Line Height: {currentLineHeight}
+          </div>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="p-2 bg-white/95 backdrop-blur-lg border border-gray-200/60 rounded-xl shadow-2xl min-w-[200px]">
+        <div className="space-y-1">
+          {lineHeights.map(({ label, value, icon, description }) => {
+            const isActive = currentLineHeight === value;
+            
+            return (
+              <button
+                key={value}
+                onClick={() => handleLineHeightChange(value)}
+                className={cn(
+                  "flex items-center gap-3 w-full px-3 py-2.5 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-purple-100 transition-all duration-300 group/item",
+                  isActive && "bg-gradient-to-r from-purple-100 to-purple-200 shadow-inner ring-1 ring-purple-300/50"
+                )}
+              >
+                <div className={cn(
+                  "p-1.5 rounded-lg transition-all duration-300 flex items-center justify-center",
+                  isActive 
+                    ? "bg-gradient-to-br from-purple-200 to-purple-300 shadow-sm" 
+                    : "bg-gradient-to-br from-gray-100 to-gray-200 group-hover/item:from-purple-100 group-hover/item:to-purple-200"
+                )}>
+                  <span className={cn(
+                    "text-lg font-mono transition-all duration-300",
+                    isActive 
+                      ? "text-purple-700" 
+                      : "text-gray-600 group-hover/item:text-purple-600"
+                  )}>{icon}</span>
+                </div>
+                <div className="flex flex-col items-start flex-1">
+                  <div className="flex items-center justify-between w-full">
+                    <span className={cn(
+                      "text-sm font-medium transition-colors",
+                      isActive ? "text-purple-800" : "text-gray-800"
+                    )}>
+                      {label}
+                    </span>
+                    {isActive && (
+                      <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
+                    )}
+                  </div>
+                  <span className="text-xs text-gray-500">{description}</span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+        
+        {/* Debug info section */}
+        <div className="mt-3 pt-3 border-t border-gray-200/60">
+          <div className="text-xs text-gray-500 mb-2 px-1">Current State:</div>
+          <div className="text-xs text-gray-400 px-1">
+            Line Height: {currentLineHeight} | Active: {lineHeights.find(h => h.value === currentLineHeight)?.label || 'Unknown'}
+          </div>
+        </div>
+        
+        {/* Quick preview section */}
+        <div className="mt-3 pt-3 border-t border-gray-200/60">
+          <div className="text-xs text-gray-500 mb-2 px-1">Preview:</div>
+          <div 
+            className="px-3 py-2 bg-gray-50/50 rounded-lg text-sm text-gray-700 border border-gray-200/40"
+            style={{ lineHeight: currentLineHeight }}
+          >
+            Sample text with {currentLineHeight} line height applied for better visualization.
+          </div>
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
 // 🎨 Enhanced Font Size Button with better animations and feedback
 const FontSizeButton = () => {
   const { editor } = useEditorStore();
-  
-  const currentFontSize = editor?.getAttributes("textStyle").fontSize 
+
+  const currentFontSize = editor?.getAttributes("textStyle").fontSize
     ? editor?.getAttributes("textStyle").fontSize.replace("px", "")
     : "16";
 
@@ -70,7 +260,7 @@ const FontSizeButton = () => {
 
   const updateFontSize = (newSize: string) => {
     const size = parseInt(newSize);
-    
+
     if (!isNaN(size) && size > 0 && size <= 96) {
       editor?.chain().focus().setFontSize(`${size}px`).run();
       setFontSize(newSize);
@@ -117,11 +307,13 @@ const FontSizeButton = () => {
         className="group/btn h-9 w-9 flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 hover:from-blue-50 hover:to-blue-100 disabled:from-gray-100 disabled:to-gray-200 disabled:cursor-not-allowed transition-all duration-300 border-r border-gray-200/60 hover:border-blue-200/60 hover:shadow-inner"
         title="Decrease font size"
       >
-        <MinusIcon className={`size-4 transition-all duration-300 ${
-          parseInt(fontSize) <= 8 
-            ? 'text-gray-400' 
-            : 'text-gray-600 group-hover/btn:text-blue-600 group-hover/btn:scale-110'
-        }`} />
+        <MinusIcon
+          className={`size-4 transition-all duration-300 ${
+            parseInt(fontSize) <= 8
+              ? "text-gray-400"
+              : "text-gray-600 group-hover/btn:text-blue-600 group-hover/btn:scale-110"
+          }`}
+        />
       </button>
 
       <div className="relative bg-gradient-to-b from-white to-gray-50">
@@ -164,11 +356,13 @@ const FontSizeButton = () => {
         className="group/btn h-9 w-9 flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 hover:from-blue-50 hover:to-blue-100 disabled:from-gray-100 disabled:to-gray-200 disabled:cursor-not-allowed transition-all duration-300 border-l border-gray-200/60 hover:border-blue-200/60 hover:shadow-inner"
         title="Increase font size"
       >
-        <PlusIcon className={`size-4 transition-all duration-300 ${
-          parseInt(fontSize) >= 96 
-            ? 'text-gray-400' 
-            : 'text-gray-600 group-hover/btn:text-blue-600 group-hover/btn:scale-110'
-        }`} />
+        <PlusIcon
+          className={`size-4 transition-all duration-300 ${
+            parseInt(fontSize) >= 96
+              ? "text-gray-400"
+              : "text-gray-600 group-hover/btn:text-blue-600 group-hover/btn:scale-110"
+          }`}
+        />
       </button>
     </div>
   );
@@ -207,24 +401,29 @@ const ListButton = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-2 bg-white/95 backdrop-blur-lg border border-gray-200/60 rounded-xl shadow-2xl min-w-[200px]">
         <div className="space-y-1">
-          {lists.map(({ label, icons: Icon, onClick, isActive, description }) => (
-            <button
-              key={label}
-              onClick={onClick}
-              className={cn(
-                "flex items-center gap-3 w-full px-3 py-2.5 rounded-lg hover:bg-gradient-to-r hover:from-yellow-50 hover:to-yellow-100 transition-all duration-300 group/item",
-                isActive() && "bg-gradient-to-r from-yellow-100 to-yellow-200 shadow-inner"
-              )}
-            >
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-yellow-100 to-yellow-200 group-hover/item:from-yellow-200 group-hover/item:to-yellow-300 transition-all duration-300">
-                <Icon className="size-4 text-yellow-700" />
-              </div>
-              <div className="flex flex-col items-start">
-                <span className="text-sm font-medium text-gray-800">{label}</span>
-                <span className="text-xs text-gray-500">{description}</span>
-              </div>
-            </button>
-          ))}
+          {lists.map(
+            ({ label, icons: Icon, onClick, isActive, description }) => (
+              <button
+                key={label}
+                onClick={onClick}
+                className={cn(
+                  "flex items-center gap-3 w-full px-3 py-2.5 rounded-lg hover:bg-gradient-to-r hover:from-yellow-50 hover:to-yellow-100 transition-all duration-300 group/item",
+                  isActive() &&
+                    "bg-gradient-to-r from-yellow-100 to-yellow-200 shadow-inner"
+                )}
+              >
+                <div className="p-1.5 rounded-lg bg-gradient-to-br from-yellow-100 to-yellow-200 group-hover/item:from-yellow-200 group-hover/item:to-yellow-300 transition-all duration-300">
+                  <Icon className="size-4 text-yellow-700" />
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="text-sm font-medium text-gray-800">
+                    {label}
+                  </span>
+                  <span className="text-xs text-gray-500">{description}</span>
+                </div>
+              </button>
+            )
+          )}
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -263,7 +462,7 @@ const AlignButton = () => {
   ];
 
   const getCurrentIcon = () => {
-    const current = alignments.find(({ value }) => 
+    const current = alignments.find(({ value }) =>
       editor?.isActive({ textAlign: value })
     );
     return current?.icons || AlignLeftIcon;
@@ -289,14 +488,17 @@ const AlignButton = () => {
               onClick={() => editor?.chain().focus().setTextAlign(value).run()}
               className={cn(
                 "flex items-center gap-3 w-full px-3 py-2.5 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-purple-100 transition-all duration-300 group/item",
-                editor?.isActive({ textAlign: value }) && "bg-gradient-to-r from-purple-100 to-purple-200 shadow-inner"
+                editor?.isActive({ textAlign: value }) &&
+                  "bg-gradient-to-r from-purple-100 to-purple-200 shadow-inner"
               )}
             >
               <div className="p-1.5 rounded-lg bg-gradient-to-br from-purple-100 to-purple-200 group-hover/item:from-purple-200 group-hover/item:to-purple-300 transition-all duration-300">
                 <Icon className="size-4 text-purple-700" />
               </div>
               <div className="flex flex-col items-start">
-                <span className="text-sm font-medium text-gray-800">{label}</span>
+                <span className="text-sm font-medium text-gray-800">
+                  {label}
+                </span>
                 <span className="text-xs text-gray-500">{description}</span>
               </div>
             </button>
@@ -887,6 +1089,7 @@ export const Toolbar = () => {
 
       {/* Align & List Controls */}
       <AlignButton />
+      <LineHeightButton />
       <ListButton />
 
       <Separator
