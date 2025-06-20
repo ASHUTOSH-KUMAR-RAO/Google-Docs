@@ -1,15 +1,31 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Search, Bell, Settings, User, Plus } from "lucide-react";
+import { SearchInput } from "./searchinput";
 
 export const Navbar = () => {
   return (
-    <div className="flex items-center justify-between h-full w-full">
-      <div className="flex gap-3 items-center shrink-0 pr-6">
-        <Link href="/">
-          <Image src="/logo.svg" alt="logo" width={36} height={36} />
+    <nav className="flex items-center justify-between h-16 w-full px-4 border-b border-gray-200 bg-white shadow-sm">
+      {/* Left Side - Logo & Brand */}
+      <div className="flex gap-3 items-center shrink-0">
+        <Link
+          href="/"
+          className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+        >
+          <Image
+            src="/logo.svg"
+            alt="Docs Logo"
+            width={36}
+            height={36}
+            className="rounded-md"
+          />
+          <h1 className="text-xl font-semibold text-gray-800 hidden sm:block">
+            Docs
+          </h1>
         </Link>
-        <h3 className="text-lg">Docs</h3>
       </div>
-    </div>
+      <SearchInput/>
+      <div>Avatar</div>
+    </nav>
   );
 };

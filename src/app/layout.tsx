@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import {Inter} from "next/font/google";
+import { Inter } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import "./globals.css";
 
-const inter =  Inter ({
-  subsets:["latin"]
-})
+const inter = Inter({
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,11 +19,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={inter.className}
-      >
-        {children}
+      <body className={inter.className}>
+        <NuqsAdapter>{children}</NuqsAdapter>
       </body>
     </html>
   );
 }
+
+// ! Why We Use nuqs Package :-
+
+// URL automatically update - ?q=laptop&page=3 jaisa URL ban jata hai
+// Shareable links - User ye URL copy-paste kar sakta hai
+// Browser navigation - Back/forward buttons properly work karte hain
+// Refresh persistence - Page refresh ke baad bhi same state rehti hai
+// SEO friendly - Search engines ko proper URLs mil jate hain
