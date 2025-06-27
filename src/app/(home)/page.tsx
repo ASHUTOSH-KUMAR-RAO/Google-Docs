@@ -1,6 +1,5 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { Navbar } from "./navbar";
+import { TemplateGallary } from "./template-gallary";
 
 const Home = () => {
   return (
@@ -10,13 +9,7 @@ const Home = () => {
       </div>
       <div className="mt-16">
 
-      <Button variant="destructive" >
-        Click{" "}
-        <Link href="/Documents/1244">
-          <span className="text-gray-500 underline">&nbsp;Here&nbsp;</span>
-        </Link>{" "}
-        And Go To the Documents Page
-      </Button>
+    <TemplateGallary/>
     </div>
     </div>
   );
