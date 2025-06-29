@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import "./globals.css";
+import { ConvexClientProvider } from "@/components/convex-client-provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,7 +21,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <NuqsAdapter>{children}</NuqsAdapter>
+        {/* 
+            NuqsAdapter is a wrapper that provides the necessary context for the Nuqs library to function properly.
+            It allows you to use the Nuqs features like URL management, state persistence, and more.
+          */}
+        <NuqsAdapter>
+          <ConvexClientProvider>{children}</ConvexClientProvider>
+        </NuqsAdapter>
       </body>
     </html>
   );
@@ -33,3 +40,7 @@ export default function RootLayout({
 // Browser navigation - Back/forward buttons properly work karte hain
 // Refresh persistence - Page refresh ke baad bhi same state rehti hai
 // SEO friendly - Search engines ko proper URLs mil jate hain
+
+
+
+

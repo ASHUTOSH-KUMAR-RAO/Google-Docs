@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Search, Bell, Settings, User, Plus } from "lucide-react";
 import { SearchInput } from "./searchinput";
+import { UserButton } from "@clerk/nextjs";
 
 export const Navbar = () => {
   return (
@@ -25,7 +25,7 @@ export const Navbar = () => {
         </Link>
       </div>
       <SearchInput/>
-      <div>Avatar</div>
+      <UserButton/>
     </nav>
   );
 };
